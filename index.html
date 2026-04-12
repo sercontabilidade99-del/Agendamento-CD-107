@@ -897,11 +897,14 @@ function processData(rows, sheetName) {
   const iPeso   = col('PESO');
   const iObs    = col('OBSERVA');
   const iCargas = col('CARGAS');
-  const iC = headers.findIndex(h => h === 'STATUS' || h.includes('STATUS'));
-
-  // Debug — remover após confirmar
-  console.log('Headers encontrados:', headers);
-  console.log('iLoja:', iLoja, 'iTipo:', iTipo, 'iDoca:', iDoca, 'iC (status):', iC);
+  // Buscar coluna STATUS em todas as linhas iniciais (pode estar em linha diferente)
+  let iC = -1;
+  for (let i = 0; i < Math.min(10, rows.length); i++) {
+    const r = rows[i].map(c => (c||'').toUpperCase().trim());
+    const idx = r.findIndex(h => h === 'STATUS');
+    if (idx !== -1) { iC = idx; break; }
+  }
+  console.log('iC (status) final:', iC);
 
   const dataRows = rows.slice(headerRow + 1).filter(r => {
     const loja = (r[iLoja] || '').trim();
