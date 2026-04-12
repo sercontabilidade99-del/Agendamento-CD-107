@@ -848,7 +848,7 @@ async function loadData() {
   document.getElementById('btnLoad').disabled = true;
   setStatus('loading', `Buscando aba "${sheetName}"…`);
 
-  const range = encodeURIComponent(`'${sheetName}'!A1:P500`);
+  const range = encodeURIComponent(`'${sheetName}'!A1:T500`);
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}&valueRenderOption=FORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING`;
 
   try {
@@ -926,16 +926,15 @@ function processData(rows, sheetName) {
     const obs    = (r[iObs]    || '').trim();
     const cargas = (r[iCargas] || '').trim();
     const cFlag  = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
-
-    // Debug — ver o que está vindo na coluna status
-    if (iC !== -1) console.log(`Loja ${loja} | iC=${iC} | valor raw="${r[iC]}" | cFlag="${cFlag}"`);
+    // Fallback: varrer toda a linha após a coluna CARGAS procurando 'C' isolado
+    const temC = cFlag === 'C' || r.some((cell, idx) => idx > Math.max(iCargas, 8) && String(cell||'').trim().toUpperCase() === 'C');
 
     // Contar veículos únicos por doca
     if (doca) veiculosUnicos.add(doca);
 
     // Determinar status — C = carregado independente de ter doca ou não
     let status;
-    if (cFlag === 'C') {
+    if (temC) {
       status = 'carregado';
       carregado++;
     } else if (doca) {
@@ -1127,7 +1126,7 @@ function switchTab(tab) {
 
 // ─── Gerencial ─────────────────────────────────────────────────────────
 async function fetchSheetData(sheetId, apiKey, sheetName) {
-  const range = encodeURIComponent(`'${sheetName}'!A1:P500`);
+  const range = encodeURIComponent(`'${sheetName}'!A1:T500`);
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}&valueRenderOption=FORMATTED_VALUE`;
   const res = await fetch(url);
   const json = await res.json();
