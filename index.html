@@ -927,6 +927,9 @@ function processData(rows, sheetName) {
     const cargas = (r[iCargas] || '').trim();
     const cFlag  = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
 
+    // Debug — ver o que está vindo na coluna status
+    if (iC !== -1) console.log(`Loja ${loja} | iC=${iC} | valor raw="${r[iC]}" | cFlag="${cFlag}"`);
+
     // Contar veículos únicos por doca
     if (doca) veiculosUnicos.add(doca);
 
