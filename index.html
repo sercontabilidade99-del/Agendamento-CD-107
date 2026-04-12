@@ -915,6 +915,7 @@ function processData(rows, sheetName) {
   const lojasPendentes = [];
   const tableData = [];
   const veiculosUnicos = new Set();
+  let lastCFlag = ''; // para herdar C de células mescladas
 
   dataRows.forEach((r) => {
     const loja   = (r[iLoja]   || '').trim();
@@ -925,7 +926,11 @@ function processData(rows, sheetName) {
     const peso   = (r[iPeso]   || '—').toString().trim();
     const obs    = (r[iObs]    || '').trim();
     const cargas = (r[iCargas] || '').trim();
-    const cFlag  = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
+    let cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
+    // Herdar C da linha anterior se célula mesclada (vazia)
+    if (cFlag === 'C') { lastCFlag = 'C'; }
+    else if (cFlag === '') { cFlag = lastCFlag; }
+    else { lastCFlag = ''; }
     // Fallback: varrer toda a linha após a coluna CARGAS procurando 'C' isolado
     const temC = cFlag === 'C' || r.some((cell, idx) => idx > Math.max(iCargas, 8) && String(cell||'').trim().toUpperCase() === 'C');
 
