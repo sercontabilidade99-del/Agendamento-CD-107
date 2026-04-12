@@ -1151,7 +1151,13 @@ function parseDayData(rows) {
   const col = name => headers.findIndex(h => h.includes(name));
   const iLoja = col('LOJA'), iLojas = headers.findIndex(h => h.includes('LOJAS') && !h.includes('LOJA ')),
         iTipo = col('TIPO'), iDoca = col('DOCA'),
-        iC = headers.findIndex(h => h === 'STATUS' || h.includes('STATUS'));
+        iCargas = col('CARGAS');
+  let iC = -1;
+  for (let i = 0; i < Math.min(10, rows.length); i++) {
+    const r = rows[i].map(c => (c||'').toUpperCase().trim());
+    const idx = r.findIndex(h => h === 'STATUS');
+    if (idx !== -1) { iC = idx; break; }
+  }
 
   const dataRows = rows.slice(headerRow + 1).filter(r => {
     const loja = (r[iLoja] || '').trim();
@@ -1159,16 +1165,23 @@ function parseDayData(rows) {
   });
 
   const result = { total: 0, carregado: 0, separacao: 0, pendente: 0, tipos: {}, lojas: {} };
+  let lastCFlagDay = '';
   dataRows.forEach(r => {
     const loja  = (r[iLoja]  || '').trim();
     const nome  = (r[iLojas !== -1 ? iLojas : iLoja+2] || '').trim();
     const tipo  = (r[iTipo]  || '—').trim();
     const doca  = (r[iDoca]  || '').trim();
-    const cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
+    let cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
+    // Herdar C de células mescladas
+    if (cFlag === 'C') { lastCFlagDay = 'C'; }
+    else if (cFlag === '') { cFlag = lastCFlagDay; }
+    else { lastCFlagDay = ''; }
+    // Fallback: varrer linha procurando C isolado
+    const temC = cFlag === 'C' || r.some((cell, idx) => idx > Math.max(iC > -1 ? iC - 2 : 8, 8) && String(cell||'').trim().toUpperCase() === 'C');
     let status;
-    if (cFlag === 'C') { status = 'carregado'; result.carregado++; }
-    else if (doca)     { status = 'separacao'; result.separacao++; }
-    else               { status = 'pendente';  result.pendente++;  }
+    if (temC)       { status = 'carregado'; result.carregado++; }
+    else if (doca)  { status = 'separacao'; result.separacao++; }
+    else            { status = 'pendente';  result.pendente++;  }
     result.total++;
     if (tipo && tipo !== '—') {
       if (!result.tipos[tipo]) result.tipos[tipo] = { total:0, carregado:0, pendente:0 };
