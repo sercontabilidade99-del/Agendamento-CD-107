@@ -704,10 +704,78 @@
 
   <!-- ABA GERENCIAL -->
   <div id="tab-gerencial" style="display:none;">
-    <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
       <button onclick="loadGerencial()" class="btn-load" style="background:var(--surface2); border:1px solid var(--border);">
         🔄 Carregar últimos 7 dias
       </button>
+      <div style="display:flex; gap:10px;">
+        <button onclick="exportarGerencialPNG()" class="btn-load" style="background:var(--accent3); color:#0d0f14;">
+          📸 Exportar PNG
+        </button>
+        <button onclick="compartilharWhatsApp()" class="btn-load" style="background:#25d366; color:#fff;">
+          💬 Texto WhatsApp
+        </button>
+      </div>
+    </div>
+
+    <!-- Card oculto para exportação PNG gerencial -->
+    <div id="gerExport" style="position:fixed; left:-9999px; top:0; width:680px; background:#0d0f14; padding:36px; font-family:'Sora',sans-serif;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom:1px solid #2a2f42; padding-bottom:16px; margin-bottom:24px;">
+        <div>
+          <div style="font-size:10px; letter-spacing:3px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase;">Stok Center · CD Nova Santa Rita</div>
+          <div style="font-size:22px; font-weight:700; color:#e8eaf2; margin-top:4px;">Resumo Gerencial</div>
+          <div style="font-size:12px; color:#4f8ef7; font-family:'DM Mono',monospace; margin-top:4px;" id="gerExpPeriodo">—</div>
+        </div>
+        <div style="background:#1e2230; border-radius:8px; padding:6px 14px; font-family:'DM Mono',monospace; font-size:11px; color:#6b7394;" id="gerExpHora">—</div>
+      </div>
+
+      <!-- KPIs consolidados -->
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;">
+        <div style="background:#161920; border:1px solid #2a2f42; border-radius:10px; padding:14px; border-top:3px solid #4f8ef7;">
+          <div style="font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Total</div>
+          <div style="font-size:32px; font-weight:700; color:#e8eaf2; line-height:1;" id="gerExpTotal">—</div>
+          <div style="font-size:10px; color:#6b7394; margin-top:3px;">7 dias</div>
+        </div>
+        <div style="background:#161920; border:1px solid #2a2f42; border-radius:10px; padding:14px; border-top:3px solid #4ff79e;">
+          <div style="font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">✅ Carregados</div>
+          <div style="font-size:32px; font-weight:700; color:#4ff79e; line-height:1;" id="gerExpCar">—</div>
+          <div style="font-size:10px; color:#6b7394; margin-top:3px;" id="gerExpCarPct">—</div>
+        </div>
+        <div style="background:#161920; border:1px solid #2a2f42; border-radius:10px; padding:14px; border-top:3px solid #f7934f;">
+          <div style="font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">🔄 Separação</div>
+          <div style="font-size:32px; font-weight:700; color:#f7934f; line-height:1;" id="gerExpSep">—</div>
+          <div style="font-size:10px; color:#6b7394; margin-top:3px;" id="gerExpSepPct">—</div>
+        </div>
+        <div style="background:#161920; border:1px solid #2a2f42; border-radius:10px; padding:14px; border-top:3px solid #f74f6a;">
+          <div style="font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">⏳ Pendentes</div>
+          <div style="font-size:32px; font-weight:700; color:#f74f6a; line-height:1;" id="gerExpPend">—</div>
+          <div style="font-size:10px; color:#6b7394; margin-top:3px;" id="gerExpPendPct">—</div>
+        </div>
+      </div>
+
+      <!-- Comparativo por dia -->
+      <div style="margin-bottom:8px; font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px;">Comparativo Diário</div>
+      <div id="gerExpDias" style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;"></div>
+
+      <!-- Tipo de carga -->
+      <div style="margin-bottom:8px; font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px;">Desempenho por Tipo de Carga</div>
+      <div id="gerExpTipos" style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;"></div>
+
+      <!-- Top pendências -->
+      <div style="margin-bottom:8px; font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px;">Top 5 Lojas com Mais Pendências</div>
+      <div id="gerExpRanking" style="display:flex; flex-direction:column; gap:6px;"></div>
+    </div>
+
+    <!-- Modal WhatsApp -->
+    <div id="modalWhats" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="font-size:16px;">💬 Texto para WhatsApp</h3>
+          <button onclick="document.getElementById('modalWhats').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;">✕</button>
+        </div>
+        <textarea id="whatsText" style="width:100%; height:300px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:'DM Mono',monospace; font-size:12px; padding:12px; resize:none; outline:none;"></textarea>
+        <button onclick="copiarWhats()" class="btn-load" style="width:100%; margin-top:12px;">📋 Copiar texto</button>
+      </div>
     </div>
 
     <div id="gerLoading" class="ger-loading" style="display:none;">
@@ -1344,6 +1412,155 @@ function renderGerencial(days) {
         </td>
       </tr>`).join('')
     : '<tr><td colspan="6" style="text-align:center;color:var(--accent3);padding:20px;">✓ Sem pendências nos últimos 7 dias</td></tr>';
+
+  // Atualizar card de exportação gerencial
+  atualizarGerExport(days, gTotal, gCar, gSep, gPend, tiposAgg, lojasAgg);
+}
+
+// ─── Exportar Gerencial PNG ────────────────────────────────────────────
+function atualizarGerExport(days, gTotal, gCar, gSep, gPend, tiposAgg, lojasAgg) {
+  const pct = (a,b) => b ? Math.round((a/b)*100) : 0;
+  const now = new Date();
+  const validDays = days.filter(d => d.data);
+  const periodo = validDays.length
+    ? `${validDays[0].label} a ${validDays[validDays.length-1].label}`
+    : 'Últimos 7 dias';
+
+  document.getElementById('gerExpPeriodo').textContent = periodo;
+  document.getElementById('gerExpHora').textContent    = `${now.toLocaleTimeString('pt-BR')} · ${now.toLocaleDateString('pt-BR')}`;
+  document.getElementById('gerExpTotal').textContent   = gTotal;
+  document.getElementById('gerExpCar').textContent     = gCar;
+  document.getElementById('gerExpCarPct').textContent  = `${pct(gCar,gTotal)}% concluído`;
+  document.getElementById('gerExpSep').textContent     = gSep;
+  document.getElementById('gerExpSepPct').textContent  = `${pct(gSep,gTotal)}% do total`;
+  document.getElementById('gerExpPend').textContent    = gPend;
+  document.getElementById('gerExpPendPct').textContent = `${pct(gPend,gTotal)}% do total`;
+
+  // Dias
+  document.getElementById('gerExpDias').innerHTML = days.filter(d=>d.data).map(d => {
+    const taxa = pct(d.data.carregado, d.data.total);
+    const barW = taxa;
+    return `
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="font-family:'DM Mono',monospace; font-size:11px; color:#6b7394; width:40px;">${d.label}</div>
+        <div style="flex:1; height:18px; background:#1e2230; border-radius:4px; overflow:hidden;">
+          <div style="width:${barW}%; height:100%; background:${taxa>=80?'#4ff79e':taxa>=50?'#f7934f':'#f74f6a'}; display:flex; align-items:center; padding-left:6px;">
+            <span style="font-size:10px; font-family:'DM Mono',monospace; color:#0d0f14; font-weight:700;">${taxa}%</span>
+          </div>
+        </div>
+        <div style="font-family:'DM Mono',monospace; font-size:10px; color:#6b7394; width:80px; text-align:right;">${d.data.carregado}/${d.data.total} cargas</div>
+      </div>`;
+  }).join('');
+
+  // Tipos
+  const tipos = Object.entries(tiposAgg).sort((a,b) => b[1].total - a[1].total);
+  const maxT = tipos[0]?.[1].total || 1;
+  document.getElementById('gerExpTipos').innerHTML = tipos.map(([tipo, v]) => {
+    const taxa = pct(v.carregado, v.total);
+    return `
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="font-family:'DM Mono',monospace; font-size:11px; color:#6b7394; width:90px;">${tipo}</div>
+        <div style="flex:1; height:18px; background:#1e2230; border-radius:4px; overflow:hidden;">
+          <div style="width:${Math.round((v.total/maxT)*100)}%; height:100%; background:#4f8ef7; display:flex; align-items:center; padding-left:6px;">
+            <span style="font-size:10px; font-family:'DM Mono',monospace; color:#fff; font-weight:700;">${v.total} cargas</span>
+          </div>
+        </div>
+        <div style="font-family:'DM Mono',monospace; font-size:10px; color:${taxa>=80?'#4ff79e':'#f7934f'}; width:50px; text-align:right;">${taxa}% ✓</div>
+      </div>`;
+  }).join('');
+
+  // Top 5 ranking
+  const ranking = Object.entries(lojasAgg)
+    .filter(([,v]) => v.pendencias > 0)
+    .sort((a,b) => b[1].pendencias - a[1].pendencias)
+    .slice(0, 5);
+  document.getElementById('gerExpRanking').innerHTML = ranking.map(([loja, v], i) => `
+    <div style="display:flex; align-items:center; gap:10px; padding:8px; background:#161920; border-radius:6px;">
+      <div style="font-family:'DM Mono',monospace; font-size:14px; font-weight:700; color:#4f8ef7; width:20px;">${i+1}</div>
+      <div style="flex:1; font-size:12px; color:#e8eaf2;">${loja}</div>
+      <div style="font-family:'DM Mono',monospace; font-size:13px; font-weight:700; color:#f74f6a;">${v.pendencias} pend.</div>
+      <div style="font-family:'DM Mono',monospace; font-size:11px; color:#6b7394;">${v.dias} dia${v.dias>1?'s':''}</div>
+    </div>
+  `).join('') || '<div style="color:#4ff79e; font-size:12px;">✓ Sem pendências</div>';
+}
+
+async function exportarGerencialPNG() {
+  if (!document.getElementById('gerExpTotal').textContent || document.getElementById('gerExpTotal').textContent === '—') {
+    alert('Carregue os dados gerenciais primeiro!'); return;
+  }
+  if (!window.html2canvas) {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    document.head.appendChild(script);
+    await new Promise(r => script.onload = r);
+  }
+  const el = document.getElementById('gerExport');
+  const canvas = await html2canvas(el, { backgroundColor: '#0d0f14', scale: 2, useCORS: true, logging: false });
+  const link = document.createElement('a');
+  link.download = `gerencial_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function compartilharWhatsApp() {
+  const el = document.getElementById('gerExpTotal');
+  if (!el.textContent || el.textContent === '—') { alert('Carregue os dados gerenciais primeiro!'); return; }
+
+  const total  = document.getElementById('gKpiTotal').textContent;
+  const car    = document.getElementById('gKpiCar').textContent;
+  const sep    = document.getElementById('gKpiSep').textContent;
+  const pend   = document.getElementById('gKpiPend').textContent;
+  const carPct = document.getElementById('gKpiCarPct').textContent;
+  const periodo= document.getElementById('gerExpPeriodo').textContent;
+  const hora   = new Date().toLocaleString('pt-BR');
+
+  // Dias
+  const diasEl = document.querySelectorAll('#dayChart .day-col');
+  let diasTxt = '';
+  document.querySelectorAll('#gerTaxaDia .bar-item').forEach(el => {
+    const label = el.querySelector('.bar-label')?.textContent || '';
+    const val   = el.querySelector('.bar-count')?.textContent || '';
+    diasTxt += `  📅 ${label}: ${val}\n`;
+  });
+
+  // Tipos
+  let tiposTxt = '';
+  document.querySelectorAll('#gerTipoChart .hbar-item').forEach(el => {
+    const label = el.querySelector('.hbar-label')?.textContent || '';
+    const val   = el.querySelector('.hbar-val')?.textContent || '';
+    const pct   = el.querySelector('.hbar-sub')?.textContent || '';
+    tiposTxt += `  📦 ${label}: ${val} · ${pct}\n`;
+  });
+
+  // Ranking
+  let rankTxt = '';
+  const rows = document.querySelectorAll('#rankBody tr');
+  Array.from(rows).slice(0,5).forEach(tr => {
+    const tds = tr.querySelectorAll('td');
+    if (tds.length >= 4) rankTxt += `  ${tds[0].textContent}. ${tds[1].textContent} — ${tds[2].textContent} pend. (${tds[3].textContent})\n`;
+  });
+
+  const texto = `🏭 *RESUMO GERENCIAL — CD NOVA SANTA RITA*\n`
+    + `📊 Período: ${periodo}\n`
+    + `🕐 ${hora}\n\n`
+    + `*📈 CONSOLIDADO 7 DIAS*\n`
+    + `• Total de cargas: *${total}*\n`
+    + `• ✅ Carregadas: *${car}* (${carPct})\n`
+    + `• 🔄 Em separação: *${sep}*\n`
+    + `• ⏳ Pendentes: *${pend}*\n\n`
+    + `*📅 TAXA DE CONCLUSÃO POR DIA*\n${diasTxt}\n`
+    + `*📦 DESEMPENHO POR TIPO DE CARGA*\n${tiposTxt}\n`
+    + `*⚠️ TOP 5 LOJAS COM MAIS PENDÊNCIAS*\n${rankTxt || '  ✓ Sem pendências no período'}`;
+
+  document.getElementById('whatsText').value = texto;
+  document.getElementById('modalWhats').style.display = 'flex';
+}
+
+function copiarWhats() {
+  const txt = document.getElementById('whatsText');
+  txt.select();
+  document.execCommand('copy');
+  alert('Texto copiado! Cole no WhatsApp.');
 }
 
 // ─── Init ──────────────────────────────────────────────────────────────
