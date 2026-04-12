@@ -705,9 +705,19 @@
   <!-- ABA GERENCIAL -->
   <div id="tab-gerencial" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
-      <button onclick="loadGerencial()" class="btn-load" style="background:var(--surface2); border:1px solid var(--border);">
-        🔄 Carregar últimos 7 dias
-      </button>
+      <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); font-family:'DM Mono',monospace;">De</label>
+          <input type="date" id="gerDataIni" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 14px;font-family:'DM Mono',monospace;font-size:13px;outline:none;" />
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); font-family:'DM Mono',monospace;">Até</label>
+          <input type="date" id="gerDataFim" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 14px;font-family:'DM Mono',monospace;font-size:13px;outline:none;" />
+        </div>
+        <button onclick="loadGerencial()" class="btn-load" style="background:var(--surface2); border:1px solid var(--border);">
+          🔄 Carregar período
+        </button>
+      </div>
       <div style="display:flex; gap:10px;">
         <button onclick="exportarGerencialPNG()" class="btn-load" style="background:var(--accent3); color:#0d0f14;">
           📸 Exportar PNG
@@ -784,7 +794,7 @@
     <div id="gerContent" style="display:none;">
 
       <!-- KPIs consolidados -->
-      <div class="section-title">Consolidado — Últimos 7 Dias</div>
+      <div class="section-title" id="gerPeriodoTitle">Consolidado — Últimos 7 Dias</div>
       <div class="ger-kpi-row">
         <div class="kpi-card blue">
           <div class="kpi-label">Total Cargas</div>
@@ -1271,18 +1281,24 @@ async function loadGerencial() {
   if (!sheetId || !apiKey) { alert('Configure o ID da planilha e a API Key na aba Diário primeiro.'); return; }
 
   document.getElementById('gerLoading').style.display = 'block';
+  document.getElementById('gerLoading').textContent = `⏳ Carregando dados de ${dataIni.toLocaleDateString('pt-BR')} a ${dataFim.toLocaleDateString('pt-BR')}…`;
   document.getElementById('gerContent').style.display = 'none';
   document.getElementById('gerEmpty').style.display = 'none';
 
-  // Gerar lista dos últimos 7 dias a partir de hoje (data real do sistema)
+  // Gerar lista de dias entre as datas selecionadas
   const today = new Date();
+  const iniVal = document.getElementById('gerDataIni').value;
+  const fimVal = document.getElementById('gerDataFim').value;
+  const dataIni = iniVal ? new Date(iniVal + 'T00:00:00') : new Date(today.getTime() - 6*24*60*60*1000);
+  const dataFim = fimVal ? new Date(fimVal + 'T00:00:00') : today;
+
   const days = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    const dd = String(d.getDate()).padStart(2,'0');
-    const mm = String(d.getMonth()+1).padStart(2,'0');
+  const cur = new Date(dataIni);
+  while (cur <= dataFim) {
+    const dd = String(cur.getDate()).padStart(2,'0');
+    const mm = String(cur.getMonth()+1).padStart(2,'0');
     days.push({ label: `${dd}/${mm}`, sheetName: `ESCALA DE ENTREGA ${dd}.${mm}`, date: `${dd}.${mm}` });
+    cur.setDate(cur.getDate() + 1);
   }
 
   // Buscar todas as abas em paralelo
@@ -1313,6 +1329,9 @@ function renderGerencial(days) {
   // KPIs consolidados
   let gTotal=0, gCar=0, gSep=0, gPend=0;
   const tiposAgg = {}, lojasAgg = {};
+  const validDays = days.filter(d=>d.data);
+  const periodo = validDays.length ? `${validDays[0].label} a ${validDays[validDays.length-1].label}` : 'Período selecionado';
+  document.getElementById('gerPeriodoTitle').textContent = `Consolidado — ${periodo}`;
 
   days.forEach(d => {
     if (!d.data) return;
@@ -1566,6 +1585,12 @@ function copiarWhats() {
 // ─── Init ──────────────────────────────────────────────────────────────
 document.getElementById('currentDate').textContent = displayDate('');
 document.getElementById('targetDate').value = new Date().toISOString().slice(0,10);
+
+// Init datas do gerencial (últimos 7 dias por padrão)
+const _today = new Date();
+const _7ago = new Date(_today.getTime() - 6*24*60*60*1000);
+document.getElementById('gerDataIni').value = _7ago.toISOString().slice(0,10);
+document.getElementById('gerDataFim').value = _today.toISOString().slice(0,10);
 
 // Salvar/restaurar config
 const saved = localStorage.getItem('escala_config');
