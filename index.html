@@ -1587,10 +1587,14 @@ document.getElementById('currentDate').textContent = displayDate('');
 document.getElementById('targetDate').value = new Date().toISOString().slice(0,10);
 
 // Init datas do gerencial (últimos 7 dias por padrão)
-const _today = new Date();
-const _7ago = new Date(_today.getTime() - 6*24*60*60*1000);
-document.getElementById('gerDataIni').value = _7ago.toISOString().slice(0,10);
-document.getElementById('gerDataFim').value = _today.toISOString().slice(0,10);
+window.addEventListener('DOMContentLoaded', () => {
+  const _today = new Date();
+  const _7ago = new Date(_today.getTime() - 6*24*60*60*1000);
+  const iniEl = document.getElementById('gerDataIni');
+  const fimEl = document.getElementById('gerDataFim');
+  if (iniEl) iniEl.value = _7ago.toISOString().slice(0,10);
+  if (fimEl) fimEl.value = _today.toISOString().slice(0,10);
+});
 
 // Salvar/restaurar config
 const saved = localStorage.getItem('escala_config');
