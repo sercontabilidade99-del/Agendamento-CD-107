@@ -899,6 +899,10 @@ function processData(rows, sheetName) {
   const iCargas = col('CARGAS');
   const iC = headers.findIndex(h => h === 'STATUS' || h.includes('STATUS'));
 
+  // Debug — remover após confirmar
+  console.log('Headers encontrados:', headers);
+  console.log('iLoja:', iLoja, 'iTipo:', iTipo, 'iDoca:', iDoca, 'iC (status):', iC);
+
   const dataRows = rows.slice(headerRow + 1).filter(r => {
     const loja = (r[iLoja] || '').trim();
     return loja && !isNaN(loja) && loja !== '';
