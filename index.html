@@ -608,8 +608,8 @@
         <div class="kpi-value" id="kpiCarregado">—</div>
         <div class="kpi-sub">marcados com C</div>
       </div>
-      <div class="kpi-card" style="border-top-color: #a78bfa; background: var(--surface);">
-        <div class="kpi-card" style="position:absolute;top:0;left:0;right:0;height:3px;background:#a78bfa;border-radius:3px 3px 0 0;"></div>
+      <div class="kpi-card" style="position:relative; overflow:hidden; border:1px solid var(--border); border-radius:var(--card-radius); padding:20px 24px; background:var(--surface);">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#a78bfa;"></div>
         <div class="kpi-label">Veículos</div>
         <div class="kpi-value" id="kpiVeiculos" style="color:#a78bfa;">—</div>
         <div class="kpi-sub">docas únicas alocadas</div>
@@ -925,12 +925,12 @@ function processData(rows, sheetName) {
     const peso   = (r[iPeso]   || '—').toString().trim();
     const obs    = (r[iObs]    || '').trim();
     const cargas = (r[iCargas] || '').trim();
-    const cFlag  = (r[iC]      || '').trim().toUpperCase();
+    const cFlag  = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
 
     // Contar veículos únicos por doca
     if (doca) veiculosUnicos.add(doca);
 
-    // Determinar status
+    // Determinar status — C = carregado independente de ter doca ou não
     let status;
     if (cFlag === 'C') {
       status = 'carregado';
@@ -1157,7 +1157,7 @@ function parseDayData(rows) {
     const nome  = (r[iLojas !== -1 ? iLojas : iLoja+2] || '').trim();
     const tipo  = (r[iTipo]  || '—').trim();
     const doca  = (r[iDoca]  || '').trim();
-    const cFlag = (r[iC]     || '').trim().toUpperCase();
+    const cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
     let status;
     if (cFlag === 'C') { status = 'carregado'; result.carregado++; }
     else if (doca)     { status = 'separacao'; result.separacao++; }
