@@ -1280,17 +1280,17 @@ async function loadGerencial() {
   const apiKey  = document.getElementById('apiKey').value.trim();
   if (!sheetId || !apiKey) { alert('Configure o ID da planilha e a API Key na aba Diário primeiro.'); return; }
 
-  document.getElementById('gerLoading').style.display = 'block';
-  document.getElementById('gerLoading').textContent = `⏳ Carregando dados de ${dataIni.toLocaleDateString('pt-BR')} a ${dataFim.toLocaleDateString('pt-BR')}…`;
-  document.getElementById('gerContent').style.display = 'none';
-  document.getElementById('gerEmpty').style.display = 'none';
-
   // Gerar lista de dias entre as datas selecionadas
   const today = new Date();
   const iniVal = document.getElementById('gerDataIni').value;
   const fimVal = document.getElementById('gerDataFim').value;
   const dataIni = iniVal ? new Date(iniVal + 'T00:00:00') : new Date(today.getTime() - 6*24*60*60*1000);
   const dataFim = fimVal ? new Date(fimVal + 'T00:00:00') : today;
+
+  document.getElementById('gerLoading').style.display = 'block';
+  document.getElementById('gerLoading').textContent = `⏳ Carregando dados de ${dataIni.toLocaleDateString('pt-BR')} a ${dataFim.toLocaleDateString('pt-BR')}…`;
+  document.getElementById('gerContent').style.display = 'none';
+  document.getElementById('gerEmpty').style.display = 'none';
 
   const days = [];
   const cur = new Date(dataIni);
