@@ -816,6 +816,12 @@
           <div class="kpi-value" id="gKpiPend">—</div>
           <div class="kpi-sub" id="gKpiPendPct">—</div>
         </div>
+        <div class="kpi-card" style="position:relative;overflow:hidden;border:1px solid var(--border);border-radius:var(--card-radius);padding:20px 24px;background:var(--surface);">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#f7934f;"></div>
+          <div class="kpi-label">⚠️ Duplicadas</div>
+          <div class="kpi-value" id="gKpiDup" style="color:#f7934f;">—</div>
+          <div class="kpi-sub">cargas em múltiplos dias</div>
+        </div>
       </div>
 
       <!-- Comparativo por dia + Tipo de carga -->
@@ -857,6 +863,24 @@
               </tr>
             </thead>
             <tbody id="rankBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Cargas duplicadas -->
+      <div class="section-title" style="margin-top:28px;">⚠️ Cargas em Múltiplos Dias</div>
+      <div id="gerDuplicadas" class="table-card">
+        <div class="table-wrap">
+          <table class="rank-table">
+            <thead>
+              <tr>
+                <th>Nº Carga / NF</th>
+                <th>Dias encontrados</th>
+                <th>Lojas</th>
+                <th>Status por dia</th>
+              </tr>
+            </thead>
+            <tbody id="dupBody"></tbody>
           </table>
         </div>
       </div>
@@ -1242,13 +1266,15 @@ function parseDayData(rows) {
     return loja && !isNaN(loja) && loja !== '';
   });
 
-  const result = { total: 0, carregado: 0, separacao: 0, pendente: 0, tipos: {}, lojas: {} };
+  const result = { total: 0, carregado: 0, separacao: 0, pendente: 0, tipos: {}, lojas: {}, cargas: {} };
   let lastCFlagDay = '';
   dataRows.forEach(r => {
     const loja  = (r[iLoja]  || '').trim();
     const nome  = (r[iLojas !== -1 ? iLojas : iLoja+2] || '').trim();
     const tipo  = (r[iTipo]  || '—').trim();
     const doca  = (r[iDoca]  || '').trim();
+    const iCargas = headers.findIndex(h => h.includes('CARGAS'));
+    const cargasVal = (r[iCargas] || '').trim();
     let cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
     // Herdar C de células mescladas
     if (cFlag === 'C') { lastCFlagDay = 'C'; }
@@ -1271,6 +1297,14 @@ function parseDayData(rows) {
     if (!result.lojas[lojaKey]) result.lojas[lojaKey] = { pendencias: 0, dias: new Set(), total: 0 };
     result.lojas[lojaKey].total++;
     if (status === 'pendente') result.lojas[lojaKey].pendencias++;
+
+    // Rastrear números de cargas individuais
+    if (cargasVal) {
+      cargasVal.split('/').forEach(nf => {
+        const n = nf.trim();
+        if (n) result.cargas[n] = { loja: `${loja} - ${nome}`, status };
+      });
+    }
   });
   return result;
 }
@@ -1432,6 +1466,33 @@ function renderGerencial(days) {
       </tr>`).join('')
     : '<tr><td colspan="6" style="text-align:center;color:var(--accent3);padding:20px;">✓ Sem pendências nos últimos 7 dias</td></tr>';
 
+  // Detectar cargas duplicadas entre dias
+  const cargasMap = {}; // nf -> [{dia, loja, status}]
+  days.forEach(d => {
+    if (!d.data) return;
+    Object.entries(d.data.cargas || {}).forEach(([nf, info]) => {
+      if (!cargasMap[nf]) cargasMap[nf] = [];
+      cargasMap[nf].push({ dia: d.label, loja: info.loja, status: info.status });
+    });
+  });
+
+  const duplicadas = Object.entries(cargasMap).filter(([, ocorrencias]) => ocorrencias.length > 1);
+
+  const STATUS_EMOJI = { carregado: '✅', separacao: '🔄', pendente: '⏳' };
+  document.getElementById('dupBody').innerHTML = duplicadas.length
+    ? duplicadas.sort((a,b) => b[1].length - a[1].length).map(([nf, ocorrencias]) => `
+        <tr>
+          <td style="font-family:'DM Mono',monospace; font-weight:700; color:var(--accent2);">${nf}</td>
+          <td style="font-family:'DM Mono',monospace; color:var(--danger); font-weight:600;">${ocorrencias.length}x · ${ocorrencias.map(o=>o.dia).join(', ')}</td>
+          <td style="font-size:12px; color:var(--muted);">${[...new Set(ocorrencias.map(o=>o.loja))].join(', ')}</td>
+          <td style="font-size:12px;">${ocorrencias.map(o=>`${o.dia}: ${STATUS_EMOJI[o.status]}`).join(' · ')}</td>
+        </tr>`)
+      .join('')
+    : '<tr><td colspan="4" style="text-align:center; color:var(--accent3); padding:20px;">✓ Nenhuma carga duplicada no período</td></tr>';
+
+  // KPI de duplicadas
+  document.getElementById('gKpiDup').textContent = duplicadas.length;
+  document.getElementById('gKpiTotal').textContent = gTotal;
   // Atualizar card de exportação gerencial
   atualizarGerExport(days, gTotal, gCar, gSep, gPend, tiposAgg, lojasAgg);
 }
