@@ -1030,11 +1030,11 @@ function processData(rows, sheetName) {
     const cargas = (r[iCargas] || '').trim();
     let cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
     // Herdar C da linha anterior se célula mesclada (vazia)
-    if (cFlag === 'C' || cFlag === 'FATURADO') { lastCFlag = 'C'; }
+    if (cFlag === 'FATURADO') { lastCFlag = 'FATURADO'; }
     else if (cFlag === '') { cFlag = lastCFlag; }
     else { lastCFlag = ''; }
     // Fallback: varrer toda a linha após a coluna CARGAS procurando 'C' isolado
-    const temC = cFlag === 'C' || cFlag === 'FATURADO' || r.some((cell, idx) => idx > Math.max(iCargas, 8) && String(cell||'').trim().toUpperCase() === 'C' || String(cell||'').trim().toUpperCase() === 'FATURADO');
+    const temC = cFlag === 'FATURADO' || r.some((cell, idx) => idx > Math.max(iCargas, 8) && String(cell||'').trim().toUpperCase() === 'FATURADO');
 
     // Contar veículos únicos por doca
     if (doca) veiculosUnicos.add(doca);
@@ -1277,11 +1277,11 @@ function parseDayData(rows) {
     const cargasVal = (r[iCargas] || '').trim();
     let cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
     // Herdar C de células mescladas
-    if (cFlag === 'C' || cFlag === 'FATURADO') { lastCFlagDay = 'C'; }
+    if (cFlag === 'FATURADO') { lastCFlagDay = 'FATURADO'; }
     else if (cFlag === '') { cFlag = lastCFlagDay; }
     else { lastCFlagDay = ''; }
     // Fallback: varrer linha procurando C isolado
-    const temC = cFlag === 'C' || cFlag === 'FATURADO' || r.some((cell, idx) => idx > Math.max(iC > -1 ? iC - 2 : 8, 8) && String(cell||'').trim().toUpperCase() === 'C' || String(cell||'').trim().toUpperCase() === 'FATURADO');
+    const temC = cFlag === 'FATURADO' || r.some((cell, idx) => idx > Math.max(iC > -1 ? iC - 2 : 8, 8) && String(cell||'').trim().toUpperCase() === 'FATURADO');
     let status;
     if (temC)       { status = 'carregado'; result.carregado++; }
     else if (doca)  { status = 'separacao'; result.separacao++; }
