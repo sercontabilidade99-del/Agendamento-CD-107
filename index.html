@@ -608,6 +608,12 @@
         <div class="kpi-value" id="kpiCarregado">—</div>
         <div class="kpi-sub">marcados como Faturado</div>
       </div>
+      <div class="kpi-card" style="position:relative;overflow:hidden;border:1px solid var(--border);border-radius:var(--card-radius);padding:20px 24px;background:var(--surface);">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#fbbf24;"></div>
+        <div class="kpi-label">⚠️ Parc. Faturado</div>
+        <div class="kpi-value" id="kpiParcial" style="color:#fbbf24;">—</div>
+        <div class="kpi-sub">requerem atenção</div>
+      </div>
       <div class="kpi-card" style="position:relative; overflow:hidden; border:1px solid var(--border); border-radius:var(--card-radius); padding:20px 24px; background:var(--surface);">
         <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#a78bfa;"></div>
         <div class="kpi-label">Veículos</div>
@@ -671,6 +677,7 @@
         <option value="pendente">⏳ Pendente</option>
         <option value="separacao">🔄 Em Separação</option>
         <option value="carregado">✅ Faturado</option>
+        <option value="parcial">⚠️ Parc. Faturado</option>
       </select>
       <select id="filtroTipo" onchange="applyFilters()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 14px;font-family:'Sora',sans-serif;font-size:13px;outline:none;cursor:pointer;">
         <option value="">Todos os tipos</option>
@@ -1013,7 +1020,7 @@ function processData(rows, sheetName) {
   });
 
   const tipoCarga = {};
-  let totalCargas = 0, pendente = 0, separacao = 0, carregado = 0;
+  let totalCargas = 0, pendente = 0, separacao = 0, carregado = 0, parcial = 0;
   const lojasPendentes = [];
   const tableData = [];
   const veiculosUnicos = new Set();
@@ -1034,16 +1041,20 @@ function processData(rows, sheetName) {
     else if (cFlag === '') { cFlag = lastCFlag; }
     else { lastCFlag = ''; }
 
-    const temC = cFlag === 'FATURADO';
+    const temC       = cFlag === 'FATURADO';
+    const temParcial = cFlag.includes('PARCIAL');
 
     // Contar veículos únicos por doca
     if (doca) veiculosUnicos.add(doca);
 
-    // Determinar status — C = carregado independente de ter doca ou não
+    // Determinar status
     let status;
     if (temC) {
       status = 'carregado';
       carregado++;
+    } else if (temParcial) {
+      status = 'parcial';
+      parcial++;
     } else if (doca) {
       status = 'separacao';
       separacao++;
@@ -1063,15 +1074,15 @@ function processData(rows, sheetName) {
 
   const totalVeiculos = veiculosUnicos.size;
 
-  renderDashboard({ tableData, tipoCarga, totalCargas, pendente, separacao, carregado, lojasPendentes, totalVeiculos });
+  renderDashboard({ tableData, tipoCarga, totalCargas, pendente, separacao, carregado, parcial, lojasPendentes, totalVeiculos });
 }
 
 // ─── Renderizar ────────────────────────────────────────────────────────
 const COLORS = ['#4f8ef7','#f7934f','#4ff79e','#f74f6a','#a78bfa','#fbbf24','#38bdf8'];
 
-const STATUS_LABEL = { pendente: '⏳ Pendente', separacao: '🔄 Em Separação', carregado: '✅ Faturado' };
-const STATUS_COLOR = { pendente: 'var(--danger)', separacao: 'var(--accent2)', carregado: 'var(--accent3)' };
-const STATUS_BG    = { pendente: 'rgba(247,79,106,0.15)', separacao: 'rgba(247,147,79,0.15)', carregado: 'rgba(79,247,158,0.15)' };
+const STATUS_LABEL = { pendente: '⏳ Pendente', separacao: '🔄 Em Separação', carregado: '✅ Faturado', parcial: '⚠️ Parc. Faturado' };
+const STATUS_COLOR = { pendente: 'var(--danger)', separacao: 'var(--accent2)', carregado: 'var(--accent3)', parcial: '#fbbf24' };
+const STATUS_BG    = { pendente: 'rgba(247,79,106,0.15)', separacao: 'rgba(247,147,79,0.15)', carregado: 'rgba(79,247,158,0.15)', parcial: 'rgba(251,191,36,0.15)' };
 
 let allData = [];
 
@@ -1111,7 +1122,7 @@ function renderTable(data) {
   `).join('') || `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:30px;">Nenhuma carga encontrada</td></tr>`;
 }
 
-function renderDashboard({ tableData, tipoCarga, totalCargas, pendente, separacao, carregado, lojasPendentes, totalVeiculos }) {
+function renderDashboard({ tableData, tipoCarga, totalCargas, pendente, separacao, carregado, parcial, lojasPendentes, totalVeiculos }) {
   allData = tableData;
 
   // KPIs
@@ -1119,6 +1130,7 @@ function renderDashboard({ tableData, tipoCarga, totalCargas, pendente, separaca
   document.getElementById('kpiPendente').textContent  = pendente;
   document.getElementById('kpiSeparacao').textContent = separacao;
   document.getElementById('kpiCarregado').textContent = carregado;
+  document.getElementById('kpiParcial').textContent   = parcial || 0;
   document.getElementById('kpiVeiculos').textContent  = totalVeiculos;
 
   // Barras de status
@@ -1281,11 +1293,13 @@ function parseDayData(rows) {
     else if (cFlag === '') { cFlag = lastCFlagDay; }
     else { lastCFlagDay = ''; }
 
-    const temC = cFlag === 'FATURADO';
+    const temC       = cFlag === 'FATURADO';
+    const temParcial = cFlag.includes('PARCIAL');
     let status;
-    if (temC)       { status = 'carregado'; result.carregado++; }
-    else if (doca)  { status = 'separacao'; result.separacao++; }
-    else            { status = 'pendente';  result.pendente++;  }
+    if (temC)          { status = 'carregado'; result.carregado++; }
+    else if (temParcial){ status = 'parcial';  result.parcial = (result.parcial||0) + 1; }
+    else if (doca)     { status = 'separacao'; result.separacao++; }
+    else               { status = 'pendente';  result.pendente++;  }
     result.total++;
     if (tipo && tipo !== '—') {
       if (!result.tipos[tipo]) result.tipos[tipo] = { total:0, carregado:0, pendente:0 };
