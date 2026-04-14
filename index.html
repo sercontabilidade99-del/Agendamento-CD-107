@@ -1024,7 +1024,6 @@ function processData(rows, sheetName) {
   const lojasPendentes = [];
   const tableData = [];
   const veiculosUnicos = new Set();
-  let lastCFlag = ''; // para herdar C de células mescladas
 
   dataRows.forEach((r) => {
     const loja   = (r[iLoja]   || '').trim();
@@ -1036,10 +1035,6 @@ function processData(rows, sheetName) {
     const obs    = (r[iObs]    || '').trim();
     const cargas = (r[iCargas] || '').trim();
     let cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
-    // Herdar C da linha anterior se célula mesclada (vazia)
-    if (cFlag === 'FATURADO') { lastCFlag = 'FATURADO'; }
-    else if (cFlag === '') { cFlag = lastCFlag; }
-    else { lastCFlag = ''; }
 
     const temC       = cFlag === 'FATURADO';
     const temParcial = cFlag.includes('PARCIAL');
@@ -1279,7 +1274,6 @@ function parseDayData(rows) {
   });
 
   const result = { total: 0, carregado: 0, separacao: 0, pendente: 0, tipos: {}, lojas: {}, cargas: {} };
-  let lastCFlagDay = '';
   dataRows.forEach(r => {
     const loja  = (r[iLoja]  || '').trim();
     const nome  = (r[iLojas !== -1 ? iLojas : iLoja+2] || '').trim();
@@ -1287,11 +1281,7 @@ function parseDayData(rows) {
     const doca  = (r[iDoca]  || '').trim();
     const iCargas = headers.findIndex(h => h.includes('CARGAS'));
     const cargasVal = (r[iCargas] || '').trim();
-    let cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
-    // Herdar C de células mescladas
-    if (cFlag === 'FATURADO') { lastCFlagDay = 'FATURADO'; }
-    else if (cFlag === '') { cFlag = lastCFlagDay; }
-    else { lastCFlagDay = ''; }
+    const cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
 
     const temC       = cFlag === 'FATURADO';
     const temParcial = cFlag.includes('PARCIAL');
