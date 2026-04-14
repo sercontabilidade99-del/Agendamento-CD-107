@@ -1033,8 +1033,8 @@ function processData(rows, sheetName) {
     if (cFlag === 'FATURADO') { lastCFlag = 'FATURADO'; }
     else if (cFlag === '') { cFlag = lastCFlag; }
     else { lastCFlag = ''; }
-    // Fallback: varrer toda a linha após a coluna CARGAS procurando 'C' isolado
-    const temC = cFlag === 'FATURADO' || r.some((cell, idx) => idx > Math.max(iCargas, 8) && String(cell||'').trim().toUpperCase() === 'FATURADO');
+
+    const temC = cFlag === 'FATURADO';
 
     // Contar veículos únicos por doca
     if (doca) veiculosUnicos.add(doca);
@@ -1280,8 +1280,8 @@ function parseDayData(rows) {
     if (cFlag === 'FATURADO') { lastCFlagDay = 'FATURADO'; }
     else if (cFlag === '') { cFlag = lastCFlagDay; }
     else { lastCFlagDay = ''; }
-    // Fallback: varrer linha procurando C isolado
-    const temC = cFlag === 'FATURADO' || r.some((cell, idx) => idx > Math.max(iC > -1 ? iC - 2 : 8, 8) && String(cell||'').trim().toUpperCase() === 'FATURADO');
+
+    const temC = cFlag === 'FATURADO';
     let status;
     if (temC)       { status = 'carregado'; result.carregado++; }
     else if (doca)  { status = 'separacao'; result.separacao++; }
