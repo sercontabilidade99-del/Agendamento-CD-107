@@ -539,7 +539,7 @@
         <div>
           <div style="font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">Conclusão da Escala</div>
           <div style="font-size:52px; font-weight:700; color:#4ff79e; line-height:1;" id="expPct">—%</div>
-          <div style="font-size:12px; color:#6b7394; margin-top:6px;" id="expPctSub">— de — cargas concluídas</div>
+          <div style="font-size:12px; color:#6b7394; margin-top:6px;" id="expPctSub">— de — cargas faturadas</div>
         </div>
         <div style="width:90px; height:90px; border-radius:50%; display:flex; align-items:center; justify-content:center;" id="expCircle">
           <div style="width:66px; height:66px; border-radius:50%; background:#0d0f14; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#4ff79e;" id="expCircleNum">—%</div>
@@ -564,7 +564,7 @@
           <div style="font-size:11px; color:#6b7394; margin-top:4px;" id="expSepPct">—</div>
         </div>
         <div style="background:#161920; border:1px solid #2a2f42; border-radius:10px; padding:16px; border-top:3px solid #4ff79e;">
-          <div style="font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">✅ Carregados</div>
+          <div style="font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">✅ Faturados</div>
           <div style="font-size:38px; font-weight:700; color:#4ff79e; line-height:1;" id="expCar">—</div>
           <div style="font-size:11px; color:#6b7394; margin-top:4px;" id="expCarPct">—</div>
         </div>
@@ -583,7 +583,7 @@
         <div id="expBarCar"  style="background:#4ff79e; height:100%;"></div>
       </div>
       <div style="display:flex; justify-content:space-between; margin-top:7px; font-size:10px; color:#6b7394; font-family:'DM Mono',monospace;">
-        <span>⏳ Pendente</span><span>🔄 Em Separação</span><span>✅ Carregado</span>
+        <span>⏳ Pendente</span><span>🔄 Em Separação</span><span>✅ Faturado</span>
       </div>
     </div>
 
@@ -604,9 +604,9 @@
         <div class="kpi-sub">doca alocada</div>
       </div>
       <div class="kpi-card green">
-        <div class="kpi-label">Carregados</div>
+        <div class="kpi-label">Faturados</div>
         <div class="kpi-value" id="kpiCarregado">—</div>
-        <div class="kpi-sub">marcados com C</div>
+        <div class="kpi-sub">marcados como Faturado</div>
       </div>
       <div class="kpi-card" style="position:relative; overflow:hidden; border:1px solid var(--border); border-radius:var(--card-radius); padding:20px 24px; background:var(--surface);">
         <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#a78bfa;"></div>
@@ -637,7 +637,7 @@
           </div>
           <div class="nf-item with">
             <span class="nf-num" id="stCarNum">—</span>
-            <span class="nf-lbl">✅ Carregado</span>
+            <span class="nf-lbl">✅ Faturado</span>
           </div>
         </div>
 
@@ -649,7 +649,7 @@
             <div id="barCar"  style="background:var(--accent3); transition:width 0.8s; height:100%;"></div>
           </div>
           <div style="display:flex; justify-content:space-between; margin-top:8px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted);">
-            <span>⏳ Pendente</span><span>🔄 Separação</span><span>✅ Carregado</span>
+            <span>⏳ Pendente</span><span>🔄 Separação</span><span>✅ Faturado</span>
           </div>
         </div>
 
@@ -670,7 +670,7 @@
         <option value="">Todos os status</option>
         <option value="pendente">⏳ Pendente</option>
         <option value="separacao">🔄 Em Separação</option>
-        <option value="carregado">✅ Carregado</option>
+        <option value="carregado">✅ Faturado</option>
       </select>
       <select id="filtroTipo" onchange="applyFilters()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 14px;font-family:'Sora',sans-serif;font-size:13px;outline:none;cursor:pointer;">
         <option value="">Todos os tipos</option>
@@ -747,7 +747,7 @@
           <div style="font-size:10px; color:#6b7394; margin-top:3px;">7 dias</div>
         </div>
         <div style="background:#161920; border:1px solid #2a2f42; border-radius:10px; padding:14px; border-top:3px solid #4ff79e;">
-          <div style="font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">✅ Carregados</div>
+          <div style="font-size:10px; color:#6b7394; font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">✅ Faturados</div>
           <div style="font-size:32px; font-weight:700; color:#4ff79e; line-height:1;" id="gerExpCar">—</div>
           <div style="font-size:10px; color:#6b7394; margin-top:3px;" id="gerExpCarPct">—</div>
         </div>
@@ -830,7 +830,7 @@
           <h3>Comparativo Diário — Últimos 7 Dias</h3>
           <div class="day-chart" id="dayChart"></div>
           <div style="display:flex; gap:16px; margin-top:16px; font-size:11px; font-family:'DM Mono',monospace; color:var(--muted);">
-            <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent3);border-radius:2px;margin-right:4px;"></span>Carregado</span>
+            <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent3);border-radius:2px;margin-right:4px;"></span>Faturado</span>
             <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent2);border-radius:2px;margin-right:4px;"></span>Em Separação</span>
             <span><span style="display:inline-block;width:10px;height:10px;background:var(--danger);border-radius:2px;margin-right:4px;"></span>Pendente</span>
           </div>
@@ -1030,11 +1030,11 @@ function processData(rows, sheetName) {
     const cargas = (r[iCargas] || '').trim();
     let cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
     // Herdar C da linha anterior se célula mesclada (vazia)
-    if (cFlag === 'C') { lastCFlag = 'C'; }
+    if (cFlag === 'C' || cFlag === 'FATURADO') { lastCFlag = 'C'; }
     else if (cFlag === '') { cFlag = lastCFlag; }
     else { lastCFlag = ''; }
     // Fallback: varrer toda a linha após a coluna CARGAS procurando 'C' isolado
-    const temC = cFlag === 'C' || r.some((cell, idx) => idx > Math.max(iCargas, 8) && String(cell||'').trim().toUpperCase() === 'C');
+    const temC = cFlag === 'C' || cFlag === 'FATURADO' || r.some((cell, idx) => idx > Math.max(iCargas, 8) && String(cell||'').trim().toUpperCase() === 'C' || String(cell||'').trim().toUpperCase() === 'FATURADO');
 
     // Contar veículos únicos por doca
     if (doca) veiculosUnicos.add(doca);
@@ -1069,7 +1069,7 @@ function processData(rows, sheetName) {
 // ─── Renderizar ────────────────────────────────────────────────────────
 const COLORS = ['#4f8ef7','#f7934f','#4ff79e','#f74f6a','#a78bfa','#fbbf24','#38bdf8'];
 
-const STATUS_LABEL = { pendente: '⏳ Pendente', separacao: '🔄 Em Separação', carregado: '✅ Carregado' };
+const STATUS_LABEL = { pendente: '⏳ Pendente', separacao: '🔄 Em Separação', carregado: '✅ Faturado' };
 const STATUS_COLOR = { pendente: 'var(--danger)', separacao: 'var(--accent2)', carregado: 'var(--accent3)' };
 const STATUS_BG    = { pendente: 'rgba(247,79,106,0.15)', separacao: 'rgba(247,147,79,0.15)', carregado: 'rgba(79,247,158,0.15)' };
 
@@ -1189,7 +1189,7 @@ function atualizarExport(total, pendente, separacao, carregado, totalVeiculos, d
 
   // Percentual de conclusão
   document.getElementById('expPct').textContent       = pctCar + '%';
-  document.getElementById('expPctSub').textContent    = `${carregado} de ${total} cargas concluídas`;
+  document.getElementById('expPctSub').textContent    = `${carregado} de ${total} cargas faturadas`;
   document.getElementById('expCircleNum').textContent = pctCar + '%';
   document.getElementById('expCircle').style.background =
     `conic-gradient(#4ff79e 0% ${pctCar}%, #1e2230 ${pctCar}% 100%)`;
@@ -1277,11 +1277,11 @@ function parseDayData(rows) {
     const cargasVal = (r[iCargas] || '').trim();
     let cFlag = (iC !== -1 && r[iC] !== undefined ? String(r[iC]) : '').trim().toUpperCase();
     // Herdar C de células mescladas
-    if (cFlag === 'C') { lastCFlagDay = 'C'; }
+    if (cFlag === 'C' || cFlag === 'FATURADO') { lastCFlagDay = 'C'; }
     else if (cFlag === '') { cFlag = lastCFlagDay; }
     else { lastCFlagDay = ''; }
     // Fallback: varrer linha procurando C isolado
-    const temC = cFlag === 'C' || r.some((cell, idx) => idx > Math.max(iC > -1 ? iC - 2 : 8, 8) && String(cell||'').trim().toUpperCase() === 'C');
+    const temC = cFlag === 'C' || cFlag === 'FATURADO' || r.some((cell, idx) => idx > Math.max(iC > -1 ? iC - 2 : 8, 8) && String(cell||'').trim().toUpperCase() === 'C' || String(cell||'').trim().toUpperCase() === 'FATURADO');
     let status;
     if (temC)       { status = 'carregado'; result.carregado++; }
     else if (doca)  { status = 'separacao'; result.separacao++; }
